@@ -1,0 +1,448 @@
+{
+	"info": {
+		"_postman_id": "d673e8e9-a32f-4cc3-bfa6-5db696f5aa11",
+		"name": "Swagger_JSON_UserModel",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "29107702"
+	},
+	"item": [
+		{
+			"name": "CreateUser",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var id = Math.floor(Math.random()*1000+1);\r",
+							"var firstName = pm.variables.replaceIn('{{$randomFirstName}}');\r",
+							"var lastName = pm.variables.replaceIn('{{$randomLastName}}');\r",
+							"\r",
+							"var userName = firstName+id\r",
+							"console.log(\"UserName is: \"+userName)\r",
+							"\r",
+							"var email = userName +'gmail.com';\r",
+							"console.log(\"EmailAddress: \"+email)\r",
+							"\r",
+							"function generatePassword(length) {\r",
+							"  const charset = \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=\";\r",
+							"  let password = \"\";\r",
+							"  \r",
+							"  for (let i = 0; i < length; i++) {\r",
+							"    const randomIndex = Math.floor(Math.random() * charset.length);\r",
+							"    password += charset[randomIndex];\r",
+							"  }\r",
+							"  \r",
+							"  return password;\r",
+							"}\r",
+							"\r",
+							"// Example: Generate a random password with a length of 8 characters\r",
+							"const password = generatePassword(8);\r",
+							"console.log(\"Password is: \"+password);\r",
+							"\r",
+							"var phoneNumber = pm.variables.replaceIn('{{$randomPhoneNumber}}');\r",
+							"\r",
+							"pm.environment.set(\"id\",id);\r",
+							"pm.environment.set(\"firstName\",firstName);\r",
+							"pm.environment.set(\"lastName\",lastName);\r",
+							"pm.environment.set(\"userName\",userName);\r",
+							"pm.environment.set(\"email\",email);\r",
+							"pm.environment.set(\"phoneNumber\",phoneNumber);\r",
+							"pm.environment.set(\"password\",password);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"id\": {{id}},\r\n  \"username\": \"{{userName}}\",\r\n  \"firstName\": \"{{firstName}}\",\r\n  \"lastName\": \"{{lastName}}\",\r\n  \"email\": \"{{email}}\",\r\n  \"password\": \"{{password}}\",\r\n  \"phone\": \"{{phoneNumber}}\",\r\n  \"userStatus\": 0\r\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/user",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetUserInfoAfterCreate",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonBody = JSON.parse(responseBody);\r",
+							"\r",
+							"var statusCode = pm.response.code;\r",
+							"console.log(statusCode)\r",
+							"console.log(jsonBody)\r",
+							"\r",
+							"switch(statusCode){\r",
+							"    case 200:\r",
+							"\r",
+							"            pm.test(\"Status code is 200\", function () {\r",
+							"                pm.response.to.have.status(statusCode);\r",
+							"            });\r",
+							"            pm.test(\"UserName is properly Matched.\",function(){\r",
+							"                pm.expect(jsonBody.username).to.eql(pm.environment.get('userName'))\r",
+							"            });\r",
+							"            pm.test(\"First Name is  properly matched.\", function(){\r",
+							"                pm.expect(jsonBody.firstName).to.eql(pm.environment.get(\"firstName\"));\r",
+							"            });\r",
+							"\r",
+							"            pm.test(\"Last name is  properly matched.\", function(){\r",
+							"                pm.expect(jsonBody.lastName).to.eql(pm.environment.get(\"lastName\"));\r",
+							"            })\r",
+							"\r",
+							"            pm.test(\"Id is properly matched.\",function(){\r",
+							"                pm.expect(jsonBody.id).to.eql(pm.environment.get('id'));\r",
+							"            })\r",
+							"            pm.test(\"Email is properly matched.\",function(){\r",
+							"                pm.expect(jsonBody.email).to.eql(pm.environment.get('email'));\r",
+							"            })\r",
+							"            pm.test(\"Password is properly matched.\",function(){\r",
+							"                pm.expect(jsonBody.password).to.eql(pm.environment.get('password'));\r",
+							"            })\r",
+							"            pm.test(\"Phone Number is properly matched.\",function(){\r",
+							"                pm.expect(jsonBody.phone).to.eql(pm.environment.get('phoneNumber'));\r",
+							"            })\r",
+							"    break\r",
+							"    case 300:\r",
+							"    case 400:\r",
+							"    case 401:\r",
+							"    case 402:\r",
+							"    case 403:\r",
+							"    case 404:\r",
+							"    case 500:\r",
+							"    case 501:\r",
+							"    case 502:\r",
+							"    case 503:\r",
+							"    case 504:\r",
+							"        pm.test(\"Status code is validated\", function(){\r",
+							"            pm.expect(statusCode).to.be.oneOf([100,200,300,401,402,403,404,500,501,502,503,504])\r",
+							"        })\r",
+							"    break\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/user/{{userName}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"user",
+						"{{userName}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateUser",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var id = Math.floor(Math.random()*1000+1);\r",
+							"var firstName = pm.variables.replaceIn('{{$randomFirstName}}');\r",
+							"var lastName = pm.variables.replaceIn('{{$randomLastName}}');\r",
+							"\r",
+							"var userName = lastName+id\r",
+							"console.log(\"UserName is: \"+userName)\r",
+							"\r",
+							"var email = userName +'gmail.com';\r",
+							"console.log(\"EmailAddress: \"+email)\r",
+							"\r",
+							"function generatePassword(length) {\r",
+							"  const charset = \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=\";\r",
+							"  let password = \"\";\r",
+							"  \r",
+							"  for (let i = 0; i < length; i++) {\r",
+							"    const randomIndex = Math.floor(Math.random() * charset.length);\r",
+							"    password += charset[randomIndex];\r",
+							"  }\r",
+							"  \r",
+							"  return password;\r",
+							"}\r",
+							"\r",
+							"// Example: Generate a random password with a length of 8 characters\r",
+							"const password = generatePassword(8);\r",
+							"console.log(\"Password is: \"+password);\r",
+							"\r",
+							"var phoneNumber = pm.variables.replaceIn('{{$randomPhoneNumber}}');\r",
+							"\r",
+							"pm.environment.set(\"id\",id);\r",
+							"pm.environment.set(\"firstName\",firstName);\r",
+							"pm.environment.set(\"lastName\",lastName);\r",
+							"pm.environment.set(\"userName\",userName);\r",
+							"pm.environment.set(\"email\",email);\r",
+							"pm.environment.set(\"phoneNumber\",phoneNumber);\r",
+							"pm.environment.set(\"password\",password);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"id\": {{id}},\r\n  \"username\": \"{{userName}}\",\r\n  \"firstName\": \"{{firstName}}\",\r\n  \"lastName\": \"{{lastName}}\",\r\n  \"email\": \"{{email}}\",\r\n  \"password\": \"{{password}}\",\r\n  \"phone\": \"{{phoneNumber}}\",\r\n  \"userStatus\": 0\r\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/user/{{userName}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"user",
+						"{{userName}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetUserInfoAfterUpdateUser",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonBody = JSON.parse(responseBody);\r",
+							"\r",
+							"var statusCode = pm.response.code;\r",
+							"console.log(statusCode)\r",
+							"console.log(jsonBody)\r",
+							"\r",
+							"switch(statusCode){\r",
+							"    case 200:\r",
+							"\r",
+							"            pm.test(\"Status code is 200\", function () {\r",
+							"                pm.response.to.have.status(statusCode);\r",
+							"            });\r",
+							"            pm.test(\"UserName is properly Matched.\",function(){\r",
+							"                pm.expect(jsonBody.username).to.eql(pm.environment.get('userName'))\r",
+							"            });\r",
+							"            pm.test(\"First Name is  properly matched.\", function(){\r",
+							"                pm.expect(jsonBody.firstName).to.eql(pm.environment.get(\"firstName\"));\r",
+							"            });\r",
+							"\r",
+							"            pm.test(\"Last name is  properly matched.\", function(){\r",
+							"                pm.expect(jsonBody.lastName).to.eql(pm.environment.get(\"lastName\"));\r",
+							"            })\r",
+							"\r",
+							"            pm.test(\"Id is properly matched.\",function(){\r",
+							"                pm.expect(jsonBody.id).to.eql(pm.environment.get('id'));\r",
+							"            })\r",
+							"            pm.test(\"Email is properly matched.\",function(){\r",
+							"                pm.expect(jsonBody.email).to.eql(pm.environment.get('email'));\r",
+							"            })\r",
+							"            pm.test(\"Password is properly matched.\",function(){\r",
+							"                pm.expect(jsonBody.password).to.eql(pm.environment.get('password'));\r",
+							"            })\r",
+							"            pm.test(\"Phone Number is properly matched.\",function(){\r",
+							"                pm.expect(jsonBody.phone).to.eql(pm.environment.get('phoneNumber'));\r",
+							"            })\r",
+							"    break\r",
+							"    case 300:\r",
+							"    case 400:\r",
+							"    case 401:\r",
+							"    case 402:\r",
+							"    case 403:\r",
+							"    case 404:\r",
+							"    case 500:\r",
+							"    case 501:\r",
+							"    case 502:\r",
+							"    case 503:\r",
+							"    case 504:\r",
+							"        pm.test(\"Status code is validated\", function(){\r",
+							"            pm.expect(statusCode).to.be.oneOf([100,200,300,401,402,403,404,500,501,502,503,504])\r",
+							"        })\r",
+							"    break\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/user/{{userName}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"user",
+						"{{userName}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/user/login?username={{userName}}&password={{password}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"user",
+						"login"
+					],
+					"query": [
+						{
+							"key": "username",
+							"value": "{{userName}}"
+						},
+						{
+							"key": "password",
+							"value": "{{password}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "LogOut",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/user/logout",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"user",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteUser",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/user/{{userName}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"user",
+						"{{userName}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
