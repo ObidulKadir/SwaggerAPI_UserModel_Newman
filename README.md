@@ -1,6 +1,13 @@
+
 #  SwaggerAPI_UserModel_Newman
 
 This repository contains API testing for the swagger server. The testing includes comprehensive test cases and assertions to ensure the APIs are functioning as expected. A Newman report has been generated for the API test results, and a bug report has been created to document any issues found during testing.
+
+
+## Technology Used
+
+- Postman
+- Newman
 
 
 ## API Documentation
